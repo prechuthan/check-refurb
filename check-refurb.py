@@ -1,45 +1,63 @@
+from multiprocessing.dummy import Array
 import string
 import requests
 from bs4 import BeautifulSoup
 
-# Constants
-APPLE_REFURB_STORE_URL = "https://www.apple.com/sg/shop/refurbished"
+
+class RefurbItem:
+    def __init__(self, link, name) -> None:
+        self.link = link
+        self.name = name
+        pass
 
 
-def get_apple_refurbished_webpage(device: string):
+def get_apple_refurbished_webpage(url: string) -> BeautifulSoup:
     # Gets the Apple refurb store webpage of the given device string
     # and returns the Respose back
-    page = requests.get(f"{APPLE_REFURB_STORE_URL}/{device}").text
+    print(f"[STATUS] Getting page ({url})")
+    page = BeautifulSoup(requests.get(url).text, "html.parser")
 
     return page
 
 
-def get_refurb_items_links(webpage: BeautifulSoup):
+def get_refurb_items_links(webpage: string) -> Array:
     # Gets the links of each refurb from the given webpage
     # and returns an Array of links
-    APPLE_URL = "https://www.apple.com"
-
+    print(f"[STATUS] Finding refurbished item links")
     li_links = webpage.find_all("li")
 
     refurb_items_links = []
 
     for link in li_links:
         if link.h3 and link.div:
-            refurb_items_links.append(APPLE_URL + link.a.get("href"))
+            refurb_items_links.append(
+                "https://www.apple.com" + link.a.get("href"))
 
     return refurb_items_links
 
 
+def get_refurb_item_details(link: string) -> RefurbItem:
+    # TODO
+    return RefurbItem(link, "macbook")
+
+
 def main():
-    print("[INFO] Initialised check-refurb script")
+    print("[STATUS] Initialised check-refurb script")
 
-    webpage_soup_parsed = BeautifulSoup(
-        get_apple_refurbished_webpage("mac"), "html.parser")
+    # Gets refurb webpage
+    webpage_soup_parsed = get_apple_refurbished_webpage(
+        "https://www.apple.com/sg/shop/refurbished/mac")
 
+    # Get links of refurb items
     refurb_items_links = get_refurb_items_links(webpage_soup_parsed)
 
+    print(f"[INFO] Total of {len(refurb_items_links)} items found")
+
+    # Get reburb items details
+    refurb_items = []
+
     for link in refurb_items_links:
-        print(f"[OUTPUT] Item {refurb_items_links.index(link) + 1}:\n{link}")
+        refurb_items.append(get_refurb_item_details(link))
 
 
 if __name__ == "__main__":
