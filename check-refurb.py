@@ -3,7 +3,6 @@ import requests
 from bs4 import BeautifulSoup
 
 # Constants
-APPLE_URL = "https://www.apple.com"
 APPLE_REFURB_STORE_URL = "https://www.apple.com/sg/shop/refurbished"
 
 
@@ -18,13 +17,15 @@ def get_apple_refurbished_webpage(device: string):
 def get_refurb_items_links(webpage: BeautifulSoup):
     # Gets the links of each refurb from the given webpage
     # and returns an Array of links
+    APPLE_URL = "https://www.apple.com"
+
     li_links = webpage.find_all("li")
 
     refurb_items_links = []
 
     for link in li_links:
         if link.h3 and link.div:
-            refurb_items_links.append(link.a.get("href"))
+            refurb_items_links.append(APPLE_URL + link.a.get("href"))
 
     return refurb_items_links
 
