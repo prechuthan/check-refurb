@@ -5,8 +5,9 @@ from bs4 import BeautifulSoup
 
 
 class RefurbItem:
-    def __init__(self, link, name) -> None:
+    def __init__(self, link, title, name) -> None:
         self.link = link
+        self.title = title
         self.name = name
         pass
 
@@ -38,7 +39,10 @@ def get_refurb_items_links(webpage: string) -> Array:
 
 def get_refurb_item_details(link: string) -> RefurbItem:
     # TODO
-    return RefurbItem(link, "macbook")
+    refurb_item_webpage = get_apple_refurbished_webpage(link)
+    refurb_item_title = refurb_item_webpage.h1.text
+
+    return RefurbItem(link, refurb_item_title, "macbook")
 
 
 def main():
